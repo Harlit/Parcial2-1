@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,20 +24,29 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ucne.parcial2.ui.theme.Ticket.TicketViewModel
+import com.ucne.parcial2.ui.theme.Ticket.TicketViewModelApi
 import com.ucne.parcial2.ui.theme.navegacion.ScreenModule
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TicketsScreen(viewModel: TicketViewModel = hiltViewModel(), navController: NavController) {
-    TicketsBody(viewModel, Modifier.fillMaxWidth(), navController)
+fun TicketsScreen(ticketId: Int, viewModel: TicketViewModelApi = hiltViewModel(), navController: NavController, onSave: () -> Unit) {
+    remember {
+        viewModel.setTicket(ticketId)
+        0
+    }
+    TicketsBody(viewModel = viewModel, Modifier.fillMaxWidth(), navController)
+    {
+        onSave()
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TicketsBody(
-    viewModel: TicketViewModel, modifier: Modifier, navController: NavController
+    viewModel: TicketViewModelApi, modifier: Modifier, navController: NavController,
+    onSave: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val mCalendar = Calendar.getInstance()
@@ -87,13 +97,6 @@ private fun TicketsBody(
         OutlinedTextField(modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
-            value = viewModel.encargadoId,
-            onValueChange = { viewModel.encargadoId = it },
-            label = { Text("Encargado ID") })
-
-        OutlinedTextField(modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
             value = viewModel.estatus,
             onValueChange = { viewModel.estatus = it },
             label = { Text("Estatus") })
@@ -118,25 +121,16 @@ private fun TicketsBody(
             label = { Text(text = "Fecha") }
         )
 
-        OutlinedTextField(modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-            value = viewModel.orden,
-            onValueChange = { viewModel.orden = it },
-            label = { Text("Orden") }
-        )
-
-
         ExtendedFloatingActionButton(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             text = { Text("Guardar") },
             icon = { Icon(imageVector = Icons.Filled.Save, contentDescription = "Save") },
-            onClick = { viewModel.insertar() }
+            onClick = { viewModel.putTicket()
+                onSave() }
         )
     }
-
 }
 
 

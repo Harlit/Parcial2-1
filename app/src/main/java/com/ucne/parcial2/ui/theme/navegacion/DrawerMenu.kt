@@ -1,5 +1,7 @@
 package com.ucne.parcial2.ui.theme.navegacion
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Favorite
@@ -9,6 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.ucne.parcial2.ui.theme.Ticket.TicktetListScreen
+import com.ucne.parcial2.ui.theme.Tickets.TicketsScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +29,7 @@ fun DrawerMenu(
     val scope = rememberCoroutineScope()
     val ic  =Icons.TwoTone.Favorite
 
-    val items = listOf(ScreenModule.Start, ScreenModule.Tickets, ScreenModule.TicketsList)
+    val items = listOf(ScreenModule.Start, ScreenModule.TicketsList)
     val selectedItem = remember { mutableStateOf(items[0]) }
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -57,4 +66,33 @@ fun DrawerMenu(
             }
         }
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun HostList()
+{
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = ScreenModule.Start.route
+    ) {
+        composable(ScreenModule.Start.route) {
+            DrawerMenu(navController = navController)
+        }
+        composable(route = ScreenModule.TicketsList.route){
+            TicktetListScreen( {}, navController = navController){ id ->
+                navController.navigate(ScreenModule.Tickets.route + "/${id}")
+            }
+        }
+        composable(
+            route = ScreenModule.Tickets.route + "/{id}",
+            arguments = listOf( navArgument("id") { type = NavType.IntType })
+        ) { capturar -> val ticketId = capturar.arguments?.getInt("id") ?: 0
+
+            TicketsScreen(ticketId = ticketId, navController = navController) {
+                navController.navigate(ScreenModule.TicketsList.route)
+            }
+        }
+    }
 }

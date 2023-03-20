@@ -16,13 +16,11 @@ class TicketRepositorio @Inject constructor
     suspend fun insert(ticket: TicketEntity) {
 
         ticketDao.insert(ticket)
-        ticketsApi.putTicket(1,ticket.toTicketDto())
+        ticketsApi.putTicket(ticket.ticketId!!,ticket.toTicketDto())
     }
 
     suspend fun delete(ticket: TicketEntity) = ticketDao.delete(ticket)
     suspend fun find(ticketId:Int) = ticketDao.find(ticketId)
     suspend fun putTickets(id: Int, ticketDto: TicketDto) = ticketsApi.putTicket(id,ticketDto)
-    //suspend fun postTickets(ticketDto: TicketDto) = ticketsApi.postTicket(ticketDto)
-
     fun getList(): Flow<List<TicketEntity>> = ticketDao.getList()
 }

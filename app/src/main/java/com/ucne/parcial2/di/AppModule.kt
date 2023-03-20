@@ -36,7 +36,7 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             TicketDb::class.java,
-            "RoomExample.db"
+            "RoomDb.db"
         )
             .fallbackToDestructiveMigration()
             .build()

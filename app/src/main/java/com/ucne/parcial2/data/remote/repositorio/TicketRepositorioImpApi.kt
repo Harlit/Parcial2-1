@@ -29,9 +29,27 @@ class TicketRepositorioImpApi @Inject constructor(
         }
     }
 
+    override fun getTicketsForId(id: Int): Flow<Resource<TicketDto>> = flow {
+        try {
+            emit(Resource.Loading())
+
+            val tickets =
+                ticketsApi.getTicketsForId(id)
+
+            emit(Resource.Success(tickets))
+        } catch (e: HttpException) {
+            //error general HTTP
+            emit(Resource.Error(e.message ?: "Error HTTP GENERAL"))
+        } catch (e: IOException) {
+            //debe verificar tu conexion a internet
+            emit(Resource.Error(e.message ?: "verificar tu conexion a internet"))
+        }
+    }
+
     override suspend fun putTickets(id: Int, ticketDto: TicketDto) {
         ticketsApi.putTicket(id, ticketDto)
     }
+
     override suspend fun deleteTickets(id: Int) = ticketsApi.deleteTicket(id)
     override suspend fun postTickets(ticketDto: TicketDto) {
         ticketsApi.postTicket(ticketDto)

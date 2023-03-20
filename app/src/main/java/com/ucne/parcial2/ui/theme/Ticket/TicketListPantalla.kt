@@ -33,8 +33,9 @@ import com.ucne.parcial2.ui.theme.navegacion.ScreenModule
 @Composable
 fun TicktetListScreen(
     onNewTicket: () -> Unit,
-    viewModel: TicketApiViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: TicketViewModelApi = hiltViewModel(),
+    navController: NavController,
+    onTicket: (Int) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     Column(Modifier.fillMaxSize()) {
@@ -62,20 +63,29 @@ fun TicktetListScreen(
             },
             floatingActionButtonPosition = FabPosition.End
         ) {
+
             val uiState by viewModel.uiState.collectAsState()
-            Box(Modifier.fillMaxSize().padding(it)) {
-                TicketListBody(uiState.tickets)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
+                TicketListBody(uiState.tickets) {
+                    onTicket(it)
+                }
             }
         }
     }
 }
 
 @Composable
-fun TicketListBody(ticketList: List<TicketDto>) {
+fun TicketListBody(ticketList: List<TicketDto>,onTicket: (Int) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         LazyColumn {
             items(ticketList) {ticket ->
-                TicketRow(ticket)
+                TicketRow(ticket){
+                    onTicket(it)
+                }
             }
         }
     }
@@ -83,10 +93,12 @@ fun TicketListBody(ticketList: List<TicketDto>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketRow(ticket: TicketDto) {
+fun TicketRow(ticket: TicketDto, onTicket: (Int) -> Unit) {
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onTicket(ticket.ticketId) })
     ) {
         Spacer(modifier = Modifier.padding(10.dp))
 
